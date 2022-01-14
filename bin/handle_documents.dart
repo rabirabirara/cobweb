@@ -6,8 +6,8 @@ import 'package:html/dom.dart';
 // import 'package:quiver/iterables.dart';
 
 // import 'cobweb.dart';
-import 'request_data.dart';
-import 'request_local.dart' show getLocalDocument;
+import 'fetch_html.dart';
+import 'fetch_local_html.dart' show getLocalDocument;
 import 'restaurant.dart';
 import 'util.dart';
 
@@ -140,8 +140,6 @@ Future<Map<String, List<Menu>>> fetchShortMenus() async {
     placeMenus.putIfAbsent(location, () => menus);
   }
 
-  // print(periodMenus);
-
   return placeMenus;
 }
 
@@ -168,10 +166,6 @@ Menu _getMenuFromMenuElement(Element e, [String? period]) {
       var description = item.querySelector(".tt-description")?.text.trim();
       dishes.add(Dish(dishname, description));
     }
-
-    // var dishes = items.map((e) {
-    //   return Dish(e.text.trim());
-    // }).toList();
 
     menu.putCategoryAndDishes(cat.trim(), dishes);
   }

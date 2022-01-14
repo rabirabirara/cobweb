@@ -18,11 +18,10 @@ import 'dart:io';
 import 'package:jiffy/jiffy.dart';
 
 import 'handle_documents.dart';
-import "request_data.dart";
+import 'fetch_html.dart';
 import 'restaurant.dart';
 
 Future<void> main(List<String> arguments) async {
-  // var document = await getDocument(uclaUrl);
   var hours = await fetchHours();
   var shortMenus = await fetchShortMenus();
   // var fullMenus = await fetchFullMenus();
@@ -39,27 +38,9 @@ Future<void> main(List<String> arguments) async {
       var p = m.period;
     }
 
-    print(e.key);
-    for (final loc in e.value) {
-      print(loc.toString());
-    }
+    // print(e.key);
+    // for (final loc in e.value) {
+    //   print(loc.toString());
+    // }
   }
-
-  // Where the food information is stored
-  // var mainContent = document.getElementById("main-content");
-  // var links = mainContent?.querySelectorAll("a"); // returns [Element]
-  // var mainUnits = mainContent?.getElementsByClassName("unit-name");
-
-  // if (links != null) {
-  //   for (final n in links) {
-  //     var newlink = n.attributes['href'] ??
-  //         "could not find 'href' attribute of link '${n.text}'";
-  //     print("'${n.text}': ${makeUrl(newlink)!}");
-  //   }
-  // } else {
-  //   print(
-  //       "either document was not found, or main-content did not contain any 'a' elements!");
-  // }
-
-  // Now: for each thing that is open:
 }
