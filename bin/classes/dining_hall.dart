@@ -1,7 +1,7 @@
 import 'package:jiffy/jiffy.dart';
 
-import 'food_place.dart' show FoodPlace, ToString;
-import 'hours.dart' show DiningPeriod, Hours, ToString;
+import 'food_place.dart' show FoodPlace;
+import 'schedule.dart' show DiningPeriod, Schedule, ToString;
 
 // Need to implement double indexing:
 // I know period, show me all halls; show me menu of h. (Common case)
@@ -11,11 +11,11 @@ import 'hours.dart' show DiningPeriod, Hours, ToString;
 
 class DiningHall extends FoodPlace {
   // maps period to short menu, as in residential overview
-  Map<DiningPeriod, Menu?> shortMenus = {};
+  Map<DiningPeriod, Menu> shortMenus = {};
   // maps period to full menu, as in detailed menu
-  Map<DiningPeriod, Menu?> fullMenus = {};
+  Map<DiningPeriod, Menu> fullMenus = {};
 
-  DiningHall(String name, Hours hours) : super(name, hours);
+  DiningHall(String name, Schedule hours) : super(name, hours);
 
   void putShortMenu(DiningPeriod p, Menu m) {
     shortMenus.putIfAbsent(p, () => m);
@@ -25,7 +25,7 @@ class DiningHall extends FoodPlace {
   String toString() {
     String out = "";
     out += "== $name ==\n";
-    out += hours.toString();
+    out += schedule.toString();
     for (final e in shortMenus.entries) {
       out += e.key.toPrettyString() + " ::\n";
       out += e.value.toString();
@@ -39,7 +39,7 @@ class DiningHall extends FoodPlace {
 // Hot Cereals -> [Oatmeal, Quinoa Flakes & Brown Rice Cereal]
 // use Menu as a data class; an enhanced map.
 class Menu {
-  String? location; // name of the dining location
+  String? name; // name of the dining location
   DiningPeriod? period; // dining period where the menu applies
   final Map<String, List<Dish>> _m = {};
 
@@ -55,7 +55,7 @@ class Menu {
     period = dp;
   }
 
-  Menu(this.location);
+  Menu(this.name);
 
   void putCategoryAndDishes(String cat, List<Dish> dishes) {
     _m.putIfAbsent(cat, () => dishes);
@@ -64,7 +64,8 @@ class Menu {
   @override
   String toString() {
     var out = "";
-    // out += "Location: " + (location ?? "N/A") + '\n';
+    out +=
+        "Location: ${name ?? "N/A"}\n...at time: ${period!.toPrettyString()}\n";
 
     for (final e in _m.entries) {
       out += "Category: " + e.key + '\n';

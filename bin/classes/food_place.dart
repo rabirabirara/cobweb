@@ -1,6 +1,6 @@
 // import 'package:jiffy/jiffy.dart';
 
-import 'hours.dart' show Hours;
+import 'schedule.dart' show Schedule;
 
 // enum PlaceType { dinein, takeout, truck, misc }
 
@@ -19,6 +19,6 @@ import 'hours.dart' show Hours;
 class FoodPlace {
   String name;
   // Both hours and menus should be indexable by period.
-  Hours hours;
-  FoodPlace(this.name, this.hours);
+  Schedule schedule;
+  FoodPlace(this.name, this.schedule);
 }

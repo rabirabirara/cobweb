@@ -28,7 +28,7 @@ extension ToString on DiningPeriod {
 }
 
 // Defines a schedule for a place that serves food.
-class Hours {
+class Schedule {
   // null Interval means it's closed then
   final List<Interval?> _timeIntervals = [];
 
@@ -36,8 +36,8 @@ class Hours {
     return _timeIntervals;
   }
 
-  Hours();
-  Hours.newClosedAllDay();
+  Schedule();
+  Schedule.newClosedAllDay();
 
   Interval? getIntervalAtPeriod(DiningPeriod dp) {
     for (final intval in _timeIntervals) {

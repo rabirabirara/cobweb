@@ -8,11 +8,11 @@ import 'package:html/dom.dart';
 // import 'cobweb.dart';
 import 'fetch_html.dart';
 // import 'fetch_local_html.dart' show getLocalDocument;
-import '../classes/hours.dart'
-    show DiningPeriod, Hours, Interval, parseTimeSpan;
+import '../classes/schedule.dart'
+    show DiningPeriod, Schedule, Interval, parseTimeSpan;
 import '../classes/dining_hall.dart';
 
-Future<Map<String, Hours>> fetchHours() async {
+Future<Map<String, Schedule>> fetchHours() async {
   var doc = await getDocument(uclaHoursUrl);
   // var doc = await getLocalDocument("hours.html");
 
@@ -42,7 +42,7 @@ Future<Map<String, Hours>> fetchHours() async {
   // has mealTimes.length + 1 columns
   // 0th column is information
   // rest are hours, which if null mean closed, and otherwise are converted to times (what representation?)
-  Map<String, Hours> locationHoursMap = {};
+  Map<String, Schedule> locationHoursMap = {};
 
   for (final row in tableBody.children) {
     final cols = row.children;
@@ -59,12 +59,13 @@ Future<Map<String, Hours>> fetchHours() async {
         // print("'$location' is open today; see ${makeUrl(asuclaUrl!)}");
       } else {
         // print("'$location' is closed all day");
-        locationHoursMap.putIfAbsent(location, () => Hours.newClosedAllDay());
+        locationHoursMap.putIfAbsent(
+            location, () => Schedule.newClosedAllDay());
       }
       continue;
     }
 
-    var hours = Hours();
+    var hours = Schedule();
 
     for (int i = 0; i != mealTimes.length; i++) {
       if (hourCells[i].hasChildNodes()) {
@@ -127,33 +128,30 @@ Future<Map<String, Map<DiningPeriod, Menu>>> fetchShortMenus() async {
     periodMenus.putIfAbsent(tempPeriodStr, () => tempElements);
   }
 
-  // now that you have period and a bunch of menu blocks:
+  // p.key = page-header (period), p,value = menu-block siblings
   // get from a menu block: location, shortMenu
   for (final p in periodMenus.entries) {
-    var period = _getPeriodFromText(p.key);
+    var period = _getPeriodFromText(p.key)!;
 
     // p.values is a list of items (menu-blocks) for a period p.
+    // Each menu-block is a different location and menu.
     for (final val in p.value) {
       var location = _getLocationFromMenuElement(val)!;
 
       // First, produce a list of short menus from the menu-item elements.
       // These menus have a period and a short menu.
-      var menus = p.value.map((e) {
-        var m = _getMenuFromMenuElement(e);
-        // * Set the shortMenu's period.
-        m.period = period;
-        return m;
-      }).toList();
+      var m = _getMenuFromMenuElement(val);
+      // * Set the shortMenu's period.
+      m.period = period;
 
-      // Second, map: period -> menu.
-      var periodToMenu = {for (var m in menus) m.period!: m};
-
-      // Third, update map: location -> {period -> menu}.
-      // if in loc map, update map with these period maps; if not, place it in.
+      // Second, map: period -> menu in the placeMenus.
       placeMenus.update(location, (v) {
-        v.addAll(periodToMenu);
+        v[period] = m;
         return v;
-      }, ifAbsent: () => periodToMenu);
+      }, ifAbsent: () {
+        return {period: m};
+      });
+      // if in loc map, update map with these period maps; if not, place it in.
 
       // We end with map: Location -> Periods -> Menus.
     }
@@ -162,7 +160,7 @@ Future<Map<String, Map<DiningPeriod, Menu>>> fetchShortMenus() async {
   return placeMenus;
 }
 
-List<DiningHall> makeDiningHalls(Map<String, Hours> locToHours, shortMenus) {
+List<DiningHall> makeDiningHalls(Map<String, Schedule> locToHours, shortMenus) {
   List<DiningHall> halls = [];
   for (final e in shortMenus.entries) {
     // e: Location name -> {Period -> Menu}

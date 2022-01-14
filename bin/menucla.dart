@@ -17,6 +17,8 @@ import 'dart:io';
 
 import 'package:jiffy/jiffy.dart';
 
+import 'classes/schedule.dart';
+import 'double_map.dart';
 import 'scrape/process_html.dart';
 import 'scrape/fetch_html.dart';
 import 'classes/dining_hall.dart';
@@ -32,5 +34,10 @@ Future<void> main(List<String> arguments) async {
 
   var dininghalls = makeDiningHalls(hours, shortMenus);
 
-  dininghalls.forEach(print);
+  var dhs = DiningHalls({for (final hall in dininghalls) hall.name: hall});
+  dhs.halls.forEach(print);
+
+  var ms = dhs.shortMenusAt(DiningPeriod.dinner);
+  print("len: ${ms.length}");
+  ms.values.forEach(print);
 }
