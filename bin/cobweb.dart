@@ -19,7 +19,7 @@ import 'package:jiffy/jiffy.dart';
 
 import 'handle_documents.dart';
 import 'fetch_html.dart';
-import 'restaurant.dart';
+import 'dining_hall.dart';
 
 Future<void> main(List<String> arguments) async {
   var hours = await fetchHours();

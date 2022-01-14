@@ -9,7 +9,7 @@ import 'package:html/dom.dart';
 import 'fetch_html.dart';
 import 'fetch_local_html.dart' show getLocalDocument;
 import 'hours.dart' show Hours, Interval, DiningPeriod;
-import 'restaurant.dart';
+import 'dining_hall.dart';
 import 'util.dart';
 
 Future<Map<String, Hours>> fetchHours() async {
