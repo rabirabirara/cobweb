@@ -1,6 +1,33 @@
 import 'package:jiffy/jiffy.dart';
 
 enum RestaurantType { dinein, takeout, truck, misc }
+// dining period and interval don't match up perfectly, but
+// intervals *are* included in dining periods.
+// there *is* a meaningful difference between them, and periods win out.
+// refer to AskHousing. https://ask.housing.ucla.edu/app/answers/detail/a_id/821/kw/meal%20periods/session/L3RpbWUvMTQwMjIxMzUyMi9zaWQvMmtBQmxoV2w%3D
+// however, even that is misleading; periods are not tied to times at all. food trucks
+// break those rules this year.
+enum DiningPeriod { breakfast, lunch, dinner, beforemidnight, aftermidnight }
+
+// * Extensions are a really nice feature of the language.
+// Rust never had this; instead you had to make a wrapper.
+// Kotlin has this though. Kotlin is pretty cool.  Okay in my book.
+extension ToString on DiningPeriod {
+  String toPrettyString() {
+    switch (this) {
+      case DiningPeriod.breakfast:
+        return "Breakfast";
+      case DiningPeriod.lunch:
+        return "Lunch";
+      case DiningPeriod.dinner:
+        return "Dinner";
+      case DiningPeriod.beforemidnight:
+        return "Late-night";
+      case DiningPeriod.aftermidnight:
+        return "Post-midnight";
+    }
+  }
+}
 
 class Restaurant {
   String name;
@@ -8,8 +35,10 @@ class Restaurant {
   // List<Menu?> shortMenu; // produced from the residential overview
   // List<Menu?> fullMenu; // produced from the specific menu page
   Hours? hours;
-  // maps period to menu, as in residential overview
-  Map<String, Menu?>? shortMenus;
+  // maps period to short menu, as in residential overview
+  Map<DiningPeriod, Menu?>? shortMenus;
+  // maps period to full menu, as in detailed menu
+  Map<DiningPeriod, Menu?>? fullMenus;
   // Map<String, Menu?>? fullMenus;
   Restaurant(this.name, this.type);
   //{this.shortMenu = const [], this.fullMenu = const [], this.hours});
@@ -18,23 +47,33 @@ class Restaurant {
 // [categories]
 // category -> [dishes]
 // Hot Cereals -> [Oatmeal, Quinoa Flakes & Brown Rice Cereal]
+// use Menu as a data class; an enhanced map.
 class Menu {
-  String? location;
-  String? _p;
-  Interval? interval;
+  String? location; // name of the dining location
+  DiningPeriod? period; // dining period where the menu applies
   final Map<String, List<Dish>> _m = {};
 
   Map<String, List<Dish>> get menu {
     return _m;
   }
 
-  String get period {
-    return _p ?? "";
+  // String get period {
+  //   return _p ?? "";
+  // }
+
+  DiningPeriod? get getPeriod {
+    return period;
   }
 
-  Menu({this.location, String? period}) {
-    _p = period;
+  set setPeriod(DiningPeriod dp) {
+    period = dp;
   }
+
+  Menu(this.location);
+
+  // Menu({this.location, String? period}) {
+  // _p = period;
+  // }
 
   void putCategoryAndDishes(String cat, List<Dish> dishes) {
     _m.putIfAbsent(cat, () => dishes);
@@ -43,7 +82,7 @@ class Menu {
   @override
   String toString() {
     var out = "";
-    out += "Location: " + (location ?? "Unknown") + '\n';
+    out += "Location: " + (location ?? "N/A") + '\n';
 
     for (final e in _m.entries) {
       out += "Category: " + e.key + '\n';
@@ -79,12 +118,14 @@ class Hours {
     return _timeIntervals;
   }
 
-  int get periodCount {
-    return _timeIntervals.length;
-  }
-
   Hours();
   Hours.newClosedAllDay();
+
+  Interval? getIntervalAtPeriod(DiningPeriod dp) {
+    for (final intval in _timeIntervals) {
+      if 
+    }
+  }
 
   bool isClosedAllDay() {
     return _timeIntervals.isEmpty || _timeIntervals.every((e) => e == null);
@@ -137,7 +178,7 @@ class Hours {
 class Interval {
   Jiffy start;
   Jiffy end;
-  String? period;
+  DiningPeriod period;
   Interval(this.start, this.end, this.period);
 
   bool includes(Jiffy time) {
@@ -146,10 +187,10 @@ class Interval {
 
   @override
   String toString() {
-    if (period != null) {
-      return "$period: ${start.format("jm")} - ${end.format("jm")}";
-    } else {
-      return "${start.format("jm")} - ${end.format("jm")}";
-    }
+    // if (period != null) {
+      return "${period.toPrettyString()}: ${start.format("jm")} - ${end.format("jm")}";
+    // } else {
+    //   return "${start.format("jm")} - ${end.format("jm")}";
+    // }
   }
 }

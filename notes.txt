@@ -54,3 +54,8 @@ where to find information on what is closed and what is open?
         : if link already shows up in cache, reuse
         : if not in cache, download again and store there
 
+-converting from full menu to short:
+    : no "w/" or "&" items
+    : only one variant of each item
+        / scrambled eggs , no fried eggs
+        / scrambled eggs , no scrambled egg whites

@@ -71,7 +71,7 @@ Future<Map<String, Hours>> fetchHours() async {
       if (hourCells[i].hasChildNodes()) {
         final timeSpan = hourCells[i].getElementsByClassName("hours-range");
 
-        var period = mealTimes[i];
+        var period = _getPeriodFromText(mealTimes[i])!;
         Interval? interval;
         // if there are no elements with class "hours-range" then it's closed
         if (timeSpan.isNotEmpty) {
@@ -135,7 +135,11 @@ Future<Map<String, List<Menu>>> fetchShortMenus() async {
   for (final p in periodMenus.entries) {
     var period = _getPeriodFromText(p.key);
     var location = _getLocationFromMenuElement(p.value.first)!;
-    var menus = p.value.map((e) => _getMenuFromMenuElement(e, period)).toList();
+    var menus = p.value.map((e) {
+      var m = _getMenuFromMenuElement(e);
+      m.period = period;
+      return m;
+    }).toList();
 
     placeMenus.putIfAbsent(location, () => menus);
   }
@@ -147,10 +151,10 @@ String? _getLocationFromMenuElement(Element e) {
   return e.querySelector(".col-header")?.text;
 }
 
-Menu _getMenuFromMenuElement(Element e, [String? period]) {
+Menu _getMenuFromMenuElement(Element e) {
   var location = _getLocationFromMenuElement(e);
 
-  var menu = Menu(location: location, period: period);
+  var menu = Menu(location);
 
   var ul = e.querySelector("ul")!;
   for (final li in ul.children) {
@@ -173,16 +177,17 @@ Menu _getMenuFromMenuElement(Element e, [String? period]) {
   return menu;
 }
 
-String _getPeriodFromText(String txt) {
-  if (txt.contains("Breakfast")) {
-    return "Breakfast";
-  } else if (txt.contains("Lunch")) {
-    return "Lunch";
-  } else if (txt.contains("Extended")) {
-    return "Extended Dinner";
-  } else if (txt.contains("Dinner")) {
-    return "Dinner";
+DiningPeriod? _getPeriodFromText(String txt) {
+  if (txt.contains(RegExp("breakfast", caseSensitive: false))) {
+    return DiningPeriod.breakfast;
+  } else if (txt.contains(RegExp("lunch", caseSensitive: false))) {
+    return DiningPeriod.lunch;
+  } else if (txt.contains(RegExp(r"(extended|late)", caseSensitive: false))) {
+    return DiningPeriod.beforemidnight;
+  } else if (txt.contains(RegExp("dinner", caseSensitive: false))) {
+    return DiningPeriod.dinner;
   } else {
-    return "Unknown";
+    // error();
+    return null;
   }
 }

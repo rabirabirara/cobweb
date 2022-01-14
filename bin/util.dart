@@ -2,6 +2,8 @@
 import 'restaurant.dart' show Interval;
 import 'package:jiffy/jiffy.dart';
 
+import 'restaurant.dart' show DiningPeriod;
+
 Jiffy parseTimeStrings(String str, [String? today]) {
   int year, month, day;
   if (today != null) {
@@ -33,7 +35,7 @@ Jiffy parseTimeStrings(String str, [String? today]) {
   return Jiffy([year, month, day, hour, minute]);
 }
 
-Interval parseTimeSpan(String timeSpan, String period, {String? today}) {
+Interval parseTimeSpan(String timeSpan, DiningPeriod period, {String? today}) {
   final parts = timeSpan.split('-');
   final startStr = parts[0].trim();
   final endStr = parts[1].trim();
