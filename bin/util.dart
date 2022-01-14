@@ -1,8 +1,6 @@
 // parses 11 p.m. or 5:30 a.m. into DateTime object.
-import 'restaurant.dart' show Interval;
+import 'hours.dart' show Interval, DiningPeriod;
 import 'package:jiffy/jiffy.dart';
-
-import 'restaurant.dart' show DiningPeriod;
 
 Jiffy parseTimeStrings(String str, [String? today]) {
   int year, month, day;
