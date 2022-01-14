@@ -15,8 +15,8 @@ String? makeUrl(String url) {
   } else if (url.startsWith(httpsPrefix) || url.startsWith(httpPrefix)) {
     return url;
   } else {
-    print("$url seems to be neither child link nor absolute path!");
-    return null;
+    throw Exception("$url seems to be neither child link nor absolute path!");
+    // return null;
   }
 }
 

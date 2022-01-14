@@ -136,13 +136,12 @@ Future<Map<String, Map<DiningPeriod, Menu>>> fetchShortMenus() async {
     // p.values is a list of items (menu-blocks) for a period p.
     // Each menu-block is a different location and menu.
     for (final val in p.value) {
-      var location = _getLocationFromMenuElement(val)!;
+      var location = _getLocationFromMenuElement(val);
 
       // First, produce a list of short menus from the menu-item elements.
       // These menus have a period and a short menu.
-      var m = _getMenuFromMenuElement(val);
-      // * Set the shortMenu's period.
-      m.period = period;
+      // Period and location are set in the function.
+      var m = _getMenuFromMenuElement(val, period);
 
       // Second, map: period -> menu in the placeMenus.
       placeMenus.update(location, (v) {
@@ -182,14 +181,14 @@ List<DiningHall> makeDiningHalls(Map<String, Schedule> locToHours, shortMenus) {
   return halls;
 }
 
-String? _getLocationFromMenuElement(Element e) {
-  return e.querySelector(".col-header")?.text;
+String _getLocationFromMenuElement(Element e) {
+  return e.querySelector(".col-header")!.text;
 }
 
-Menu _getMenuFromMenuElement(Element e) {
+Menu _getMenuFromMenuElement(Element e, DiningPeriod dp) {
   var location = _getLocationFromMenuElement(e);
 
-  var menu = Menu(location);
+  var menu = Menu(location, dp);
 
   var ul = e.querySelector("ul")!;
   for (final li in ul.children) {
@@ -212,7 +211,7 @@ Menu _getMenuFromMenuElement(Element e) {
   return menu;
 }
 
-DiningPeriod? _getPeriodFromText(String txt) {
+DiningPeriod _getPeriodFromText(String txt) {
   if (txt.contains(RegExp("breakfast", caseSensitive: false))) {
     return DiningPeriod.breakfast;
   } else if (txt.contains(RegExp("lunch", caseSensitive: false))) {
@@ -222,7 +221,7 @@ DiningPeriod? _getPeriodFromText(String txt) {
   } else if (txt.contains(RegExp("dinner", caseSensitive: false))) {
     return DiningPeriod.dinner;
   } else {
-    // error();
-    return null;
+    throw Exception("could not identify DiningPeriod from text: $txt");
+    // return null;
   }
 }

@@ -38,6 +38,5 @@ Future<void> main(List<String> arguments) async {
   dhs.halls.forEach(print);
 
   var ms = dhs.shortMenusAt(DiningPeriod.dinner);
-  print("len: ${ms.length}");
   ms.values.forEach(print);
 }

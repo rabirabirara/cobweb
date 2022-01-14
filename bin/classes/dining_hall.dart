@@ -39,8 +39,8 @@ class DiningHall extends FoodPlace {
 // Hot Cereals -> [Oatmeal, Quinoa Flakes & Brown Rice Cereal]
 // use Menu as a data class; an enhanced map.
 class Menu {
-  String? name; // name of the dining location
-  DiningPeriod? period; // dining period where the menu applies
+  String name; // name of the dining location
+  DiningPeriod period; // dining period where the menu applies
   final Map<String, List<Dish>> _m = {};
 
   Map<String, List<Dish>> get menu {
@@ -55,7 +55,7 @@ class Menu {
     period = dp;
   }
 
-  Menu(this.name);
+  Menu(this.name, this.period);
 
   void putCategoryAndDishes(String cat, List<Dish> dishes) {
     _m.putIfAbsent(cat, () => dishes);
@@ -64,8 +64,7 @@ class Menu {
   @override
   String toString() {
     var out = "";
-    out +=
-        "Location: ${name ?? "N/A"}\n...at time: ${period!.toPrettyString()}\n";
+    out += "Location: $name\n...at time: ${period!.toPrettyString()}\n";
 
     for (final e in _m.entries) {
       out += "Category: " + e.key + '\n';

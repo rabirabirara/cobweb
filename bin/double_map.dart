@@ -26,12 +26,10 @@ class DiningHalls {
     Map<Name, Menu> shortMenuMap = {};
     // for each dining hall:
     for (final dh in dhs.values) {
-      print("Name: ${dh.name}");
       // for each period > shortmenu:
       var m = dh.shortMenus[dp];
       if (m != null) {
-        print("fsdfsdfsdf: ${m.name}");
-        shortMenuMap[m.name!] = m;
+        shortMenuMap[m.name] = m;
       }
     }
     return shortMenuMap;
