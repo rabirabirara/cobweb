@@ -8,6 +8,7 @@ import 'package:html/dom.dart';
 // import 'cobweb.dart';
 import 'fetch_html.dart';
 import 'fetch_local_html.dart' show getLocalDocument;
+import 'hours.dart' show Hours, Interval, DiningPeriod;
 import 'restaurant.dart';
 import 'util.dart';
 
@@ -112,14 +113,12 @@ Future<Map<String, List<Menu>>> fetchShortMenus() async {
   // each period maps period element to a map of menus
   // each map of menus maps location name to shortMenu
   Map<String, List<Element>> periodMenus = {};
-  String period = "";
+  String? period;
   List<Element> placeMenuElements = [];
   for (final e in justMenus) {
     if (e.id == "page-header") {
-      // add period and elements if they're not empty
-      if (period.isNotEmpty) {
-        // Dart is like Java and passes everything by object ref.  Need to clone lists.
-        // Rust would have given error here... would've told me something was wrong... I miss Rust...
+      // period is null if on first iteration
+      if (period != null) {
         periodMenus.putIfAbsent(period, () => List.from(placeMenuElements));
         placeMenuElements.clear();
       }
@@ -128,7 +127,7 @@ Future<Map<String, List<Menu>>> fetchShortMenus() async {
       placeMenuElements.add(e);
     }
   }
-  if (period.isNotEmpty) {
+  if (period != null) {
     periodMenus.putIfAbsent(period, () => placeMenuElements);
   }
 

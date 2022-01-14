@@ -26,11 +26,10 @@ Future<void> main(List<String> arguments) async {
   var shortMenus = await fetchShortMenus();
   // var fullMenus = await fetchFullMenus();
 
-  var rn = Jiffy();
-  var rests = [];
+  // var rests = [];
   for (final e in shortMenus.entries) {
-    var r = Restaurant(e.key, RestaurantType.dinein);
     var h = hours[e.key];
+    var r = DiningHall(e.key, h!);
 
     // all menus for the location e.key
     var ms = e.value;
