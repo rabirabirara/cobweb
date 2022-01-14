@@ -7,10 +7,9 @@ import 'package:html/dom.dart';
 
 // import 'cobweb.dart';
 import 'fetch_html.dart';
-import 'fetch_local_html.dart' show getLocalDocument;
-import 'hours.dart' show DiningPeriod, Hours, Interval, ToString;
+// import 'fetch_local_html.dart' show getLocalDocument;
+import 'hours.dart' show DiningPeriod, Hours, Interval, parseTimeSpan;
 import 'dining_hall.dart';
-import 'util.dart';
 
 Future<Map<String, Hours>> fetchHours() async {
   var doc = await getDocument(uclaHoursUrl);
