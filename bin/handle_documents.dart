@@ -136,6 +136,7 @@ Future<Map<String, List<Menu>>> fetchShortMenus() async {
     var location = _getLocationFromMenuElement(p.value.first)!;
     var menus = p.value.map((e) {
       var m = _getMenuFromMenuElement(e);
+      // * Set the shortMenu's period.
       m.period = period;
       return m;
     }).toList();

@@ -1,5 +1,7 @@
 import 'package:jiffy/jiffy.dart';
 
+import 'food_place.dart' show ToString;
+
 // dining period and interval don't match up perfectly, but
 // intervals *are* included in dining periods.
 // there *is* a meaningful difference between them, and periods win out.

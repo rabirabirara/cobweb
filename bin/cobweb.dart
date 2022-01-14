@@ -27,6 +27,7 @@ Future<void> main(List<String> arguments) async {
   // var fullMenus = await fetchFullMenus();
 
   // var rests = [];
+  List<DiningHall> halls = [];
   for (final e in shortMenus.entries) {
     var h = hours[e.key];
     var r = DiningHall(e.key, h!);
@@ -34,12 +35,17 @@ Future<void> main(List<String> arguments) async {
     // all menus for the location e.key
     var ms = e.value;
     for (final m in ms) {
-      var p = m.period;
+      var p = m.period!;
+      r.putShortMenu(p, m);
     }
+
+    halls.add(r);
 
     // print(e.key);
     // for (final loc in e.value) {
     //   print(loc.toString());
     // }
   }
+
+  halls.forEach(print);
 }

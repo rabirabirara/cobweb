@@ -1,6 +1,6 @@
 import 'package:jiffy/jiffy.dart';
 
-import 'food_place.dart' show FoodPlace;
+import 'food_place.dart' show FoodPlace, ToString;
 import 'hours.dart' show DiningPeriod, Hours;
 
 class DiningHall extends FoodPlace {
@@ -14,6 +14,17 @@ class DiningHall extends FoodPlace {
 
   void putShortMenu(DiningPeriod p, Menu m) {
     shortMenus.putIfAbsent(p, () => m);
+  }
+
+  @override
+  String toString() {
+    String out = "";
+    out += hours.toString();
+    for (final e in shortMenus.entries) {
+      out += e.key.toPrettyString() + " ::\n";
+      out += e.value.toString();
+    }
+    return out;
   }
 }
 
@@ -39,10 +50,6 @@ class Menu {
   }
 
   Menu(this.location);
-
-  // Menu({this.location, String? period}) {
-  // _p = period;
-  // }
 
   void putCategoryAndDishes(String cat, List<Dish> dishes) {
     _m.putIfAbsent(cat, () => dishes);
