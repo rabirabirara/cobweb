@@ -25,14 +25,14 @@ import 'classes/dining_hall.dart';
 
 Future<void> main(List<String> arguments) async {
   // hours: {Location -> Hours}
-  var hours = await fetchHours();
+  var schedules = await fetchHours();
 
   // shortMenus: {Location -> {Period -> Menu}}
-  var shortMenus = await fetchShortMenus();
+  var nameToPeriodToShortMenu = await fetchShortMenus();
 
   // var fullMenus = await fetchFullMenus();
 
-  var dininghalls = makeDiningHalls(hours, shortMenus);
+  var dininghalls = makeDiningHalls(schedules, nameToPeriodToShortMenu);
 
   var dhs = DiningHalls({for (final hall in dininghalls) hall.name: hall});
   dhs.halls.forEach(print);
