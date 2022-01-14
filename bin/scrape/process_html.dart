@@ -8,8 +8,9 @@ import 'package:html/dom.dart';
 // import 'cobweb.dart';
 import 'fetch_html.dart';
 // import 'fetch_local_html.dart' show getLocalDocument;
-import 'hours.dart' show DiningPeriod, Hours, Interval, parseTimeSpan;
-import 'dining_hall.dart';
+import '../classes/hours.dart'
+    show DiningPeriod, Hours, Interval, parseTimeSpan;
+import '../classes/dining_hall.dart';
 
 Future<Map<String, Hours>> fetchHours() async {
   var doc = await getDocument(uclaHoursUrl);
@@ -52,10 +53,10 @@ Future<Map<String, Hours>> fetchHours() async {
     final hourCells = cols.sublist(1);
 
     if (hourCells.length == 1) {
-      // must be closed all day, or be ASUCLA's bullshit thing
+      // if only one cell, either closed all day or ASUCLA's special row
       if (hourCells[0].className == "hours-open") {
-        final asuclaUrl = hourCells[0].querySelector("a")?.attributes['href'];
-        print("'$location' is open today; see ${makeUrl(asuclaUrl!)}");
+        // final asuclaUrl = hourCells[0].querySelector("a")?.attributes['href'];
+        // print("'$location' is open today; see ${makeUrl(asuclaUrl!)}");
       } else {
         // print("'$location' is closed all day");
         locationHoursMap.putIfAbsent(location, () => Hours.newClosedAllDay());
@@ -65,24 +66,22 @@ Future<Map<String, Hours>> fetchHours() async {
 
     var hours = Hours();
 
-    // if has children then get the time from the inner span
-    // if no children then must be closed
     for (int i = 0; i != mealTimes.length; i++) {
       if (hourCells[i].hasChildNodes()) {
         final timeSpan = hourCells[i].getElementsByClassName("hours-range");
 
         var period = _getPeriodFromText(mealTimes[i])!;
         Interval? interval;
-        // if there are no elements with class "hours-range" then it's closed
+
+        // If there are no elements with class "hours-range", then it's closed.
         if (timeSpan.isNotEmpty) {
           interval = parseTimeSpan(timeSpan.first.text, period, today: dateStr);
         }
-        // print("'$location' at $period: ${interval ?? 'CLOSED'}");
         hours.addInterval(interval);
       }
     }
 
-    locationHoursMap.putIfAbsent(location, () => hours);
+    locationHoursMap[location] = hours;
   }
 
   return locationHoursMap;
@@ -94,12 +93,14 @@ Future<Map<String, Map<DiningPeriod, Menu>>> fetchShortMenus() async {
   // var doc = await getLocalDocument("menus-periods.html");
 
   // maps location to menus for all periods as available
+  // we will fill this out and at the end return it.
   Map<String, Map<DiningPeriod, Menu>> placeMenus = {};
 
   // main content div
   // children: nav-extras, announce, headers, detail link, menublock(cols?)
   var mainContentChildren = doc.getElementById("main-content")!.children;
 
+  // Remove elements that aren't page headers or menu-block divs.
   var justMenus = mainContentChildren.where((e) {
     return (e.id == "page-header" || e.className.contains("menu-block"));
   }).toList();
@@ -108,22 +109,22 @@ Future<Map<String, Map<DiningPeriod, Menu>>> fetchShortMenus() async {
   // each period maps period element to a map of menus
   // each map of menus maps location name to shortMenu
   Map<String, List<Element>> periodMenus = {};
-  String? periodStr;
-  List<Element> placeMenuElements = [];
+  String? tempPeriodStr;
+  List<Element> tempElements = [];
   for (final e in justMenus) {
     if (e.id == "page-header") {
       // period is null if on first iteration
-      if (periodStr != null) {
-        periodMenus.putIfAbsent(periodStr, () => List.from(placeMenuElements));
-        placeMenuElements.clear();
+      if (tempPeriodStr != null) {
+        periodMenus.putIfAbsent(tempPeriodStr, () => List.from(tempElements));
+        tempElements.clear();
       }
-      periodStr = e.text;
+      tempPeriodStr = e.text;
     } else if (e.className.contains("menu-block")) {
-      placeMenuElements.add(e);
+      tempElements.add(e);
     }
   }
-  if (periodStr != null) {
-    periodMenus.putIfAbsent(periodStr, () => placeMenuElements);
+  if (tempPeriodStr != null) {
+    periodMenus.putIfAbsent(tempPeriodStr, () => tempElements);
   }
 
   // now that you have period and a bunch of menu blocks:
@@ -159,6 +160,28 @@ Future<Map<String, Map<DiningPeriod, Menu>>> fetchShortMenus() async {
   }
 
   return placeMenus;
+}
+
+List<DiningHall> makeDiningHalls(Map<String, Hours> locToHours, shortMenus) {
+  List<DiningHall> halls = [];
+  for (final e in shortMenus.entries) {
+    // e: Location name -> {Period -> Menu}
+
+    // Build the DiningHall first with location and hours; add menus next.
+    var r = DiningHall(e.key, locToHours[e.key]!);
+
+    // Add menus to the dining hall, mapped by period -> menu (per location).
+    // e.value = all period>menus at location: e.key
+    var periodToMenus = e.value;
+    for (final m in periodToMenus.entries) {
+      // m.value = all menus for period m.key at location e.key
+      r.putShortMenu(m.key, m.value);
+    }
+
+    // Add the DiningHall to our collection of DiningHalls.
+    halls.add(r);
+  }
+  return halls;
 }
 
 String? _getLocationFromMenuElement(Element e) {
