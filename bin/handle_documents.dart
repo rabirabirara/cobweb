@@ -8,7 +8,7 @@ import 'package:html/dom.dart';
 // import 'cobweb.dart';
 import 'fetch_html.dart';
 import 'fetch_local_html.dart' show getLocalDocument;
-import 'hours.dart' show Hours, Interval, DiningPeriod;
+import 'hours.dart' show DiningPeriod, Hours, Interval, ToString;
 import 'dining_hall.dart';
 import 'util.dart';
 
@@ -86,10 +86,6 @@ Future<Map<String, Hours>> fetchHours() async {
     locationHoursMap.putIfAbsent(location, () => hours);
   }
 
-  locationHoursMap.forEach((key, value) {
-    print("$key: $value");
-  });
-
   return locationHoursMap;
 }
 
@@ -135,23 +131,32 @@ Future<Map<String, Map<DiningPeriod, Menu>>> fetchShortMenus() async {
   // get from a menu block: location, shortMenu
   for (final p in periodMenus.entries) {
     var period = _getPeriodFromText(p.key);
-    var location = _getLocationFromMenuElement(p.value.first)!;
 
-    // First, produce a list of short menus from the menu-item elements.
-    var menus = p.value.map((e) {
-      var m = _getMenuFromMenuElement(e);
-      // * Set the shortMenu's period.
-      m.period = period;
-      return m;
-    }).toList();
+    // p.values is a list of items (menu-blocks) for a period p.
+    for (final val in p.value) {
+      var location = _getLocationFromMenuElement(val)!;
 
-    // Second, map: period -> menu.
-    placeMenus.putIfAbsent(
-        location,
-        () => {
-              for (var m in menus) m.period!: m,
-            });
-    // We end with map: Location -> Periods -> Menus.
+      // First, produce a list of short menus from the menu-item elements.
+      // These menus have a period and a short menu.
+      var menus = p.value.map((e) {
+        var m = _getMenuFromMenuElement(e);
+        // * Set the shortMenu's period.
+        m.period = period;
+        return m;
+      }).toList();
+
+      // Second, map: period -> menu.
+      var periodToMenu = {for (var m in menus) m.period!: m};
+
+      // Third, update map: location -> {period -> menu}.
+      // if in loc map, update map with these period maps; if not, place it in.
+      placeMenus.update(location, (v) {
+        v.addAll(periodToMenu);
+        return v;
+      }, ifAbsent: () => periodToMenu);
+
+      // We end with map: Location -> Periods -> Menus.
+    }
   }
 
   return placeMenus;

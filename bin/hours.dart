@@ -10,6 +10,23 @@ import 'food_place.dart' show ToString;
 // break those rules this year.
 enum DiningPeriod { breakfast, lunch, dinner, beforemidnight, aftermidnight }
 
+extension ToString on DiningPeriod {
+  String toPrettyString() {
+    switch (this) {
+      case DiningPeriod.breakfast:
+        return "Breakfast";
+      case DiningPeriod.lunch:
+        return "Lunch";
+      case DiningPeriod.dinner:
+        return "Dinner";
+      case DiningPeriod.beforemidnight:
+        return "Late-night";
+      case DiningPeriod.aftermidnight:
+        return "Post-midnight";
+    }
+  }
+}
+
 // Defines a schedule for a place that serves food.
 class Hours {
   // null Interval means it's closed then

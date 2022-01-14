@@ -1,16 +1,21 @@
 import 'package:jiffy/jiffy.dart';
 
 import 'food_place.dart' show FoodPlace, ToString;
-import 'hours.dart' show DiningPeriod, Hours;
+import 'hours.dart' show DiningPeriod, Hours, ToString;
+
+// Need to implement double indexing:
+// I know period, show me all halls; show me menu of h. (Common case)
+// I know hall, show me all periods; show me menu at p.
+// But when we first fetch data, we fetch hours by location...
+// class DiningHallTable {}
 
 class DiningHall extends FoodPlace {
   // maps period to short menu, as in residential overview
   Map<DiningPeriod, Menu?> shortMenus = {};
   // maps period to full menu, as in detailed menu
   Map<DiningPeriod, Menu?> fullMenus = {};
-  // Map<String, Menu?>? fullMenus;
+
   DiningHall(String name, Hours hours) : super(name, hours);
-  //{this.shortMenu = const [], this.fullMenu = const [], this.hours});
 
   void putShortMenu(DiningPeriod p, Menu m) {
     shortMenus.putIfAbsent(p, () => m);

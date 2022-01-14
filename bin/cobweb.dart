@@ -22,22 +22,29 @@ import 'fetch_html.dart';
 import 'dining_hall.dart';
 
 Future<void> main(List<String> arguments) async {
+  // hours: {Location -> Hours}
   var hours = await fetchHours();
+  // shortMenus: {Location -> {Period -> Menu}}
   var shortMenus = await fetchShortMenus();
   // var fullMenus = await fetchFullMenus();
 
   // var rests = [];
   List<DiningHall> halls = [];
   for (final e in shortMenus.entries) {
-    var h = hours[e.key];
-    var r = DiningHall(e.key, h!);
+    // e: Location name -> {Period -> Menu}
 
-    // all menus for the location e.key
-    var ms = e.value;
-    for (final m in ms.entries) {
+    // Build the DiningHall first with location and hours; add menus next.
+    var r = DiningHall(e.key, hours[e.key]!);
+
+    // Add menus to the dining hall, mapped by period -> menu (per location).
+    // e.value = all period>menus at location: e.key
+    var periodToMenus = e.value;
+    for (final m in periodToMenus.entries) {
+      // m.value = all menus for period m.key at location e.key
       r.putShortMenu(m.key, m.value);
     }
 
+    // Add the DiningHall to our collection of DiningHalls.
     halls.add(r);
   }
 
