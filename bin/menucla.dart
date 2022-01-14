@@ -28,7 +28,6 @@ Future<void> main(List<String> arguments) async {
   var shortMenus = await fetchShortMenus();
   // var fullMenus = await fetchFullMenus();
 
-  // var rests = [];
   List<DiningHall> halls = [];
   for (final e in shortMenus.entries) {
     // e: Location name -> {Period -> Menu}
