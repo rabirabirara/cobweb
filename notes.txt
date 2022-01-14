@@ -1,0 +1,56 @@
+
+
+Purpose of the app:
+I am a simple man, and a strong proponent of individual experience and will, but god damn,
+all I want from an app is to hear my stomach rumble, pull up my phone, turn on the Wi-Fi,
+click on the app a single time, and see the goddamn menus, notably the most important dishes
+and the food trucks and the daily specials and that's it; I don't want to open my damn web
+browser because my phone is slow as fuck; I don't want to wait ten seconds for the shitty
+ucla app to load every div and container; I just want pure and simple food knowledge. that's it.
+
+supporting things like choosing a date on the calendar, or seeing future menus, or noting
+special events, that's all nice, but not necessary and won't be in the first version.
+
+
+show all dine-ins and take-outs, but sort by what is open.
+
+open:
+    dine-ins - show current dishes (important only) with marquee package (scrolling text)
+    take-outs - show today's special (scrolling text if needed)
+    food trucks - show current trucks
+closed:
+    dine-ins - show next opening time (nothing else; if they're curious keep them curious)
+    take-outs - show next opening time
+    food trucks - show next opening time and next food trucks
+
+To get times: scrape "https://menu.dining.ucla.edu/Hours" of times from formatted table.
+
+where to find information on what is closed and what is open?
+    : try "http://menu.dining.ucla.edu/Pages/Menus" for complete list of eatable places (sans food trucks)
+    : hours page still gives some good information
+        : check for class="hours-table", it's a unique class on the page
+
+
+
+
+-should implement caching - "offline first architecture"
+    : https://appmattus.medium.com/caching-made-simple-on-android-d6e024e3726b
+    : when to refresh? think back to minimap's cache
+    : give manual refresh option too, but if no internet or can't load page, *don't* clear cache
+
+-need a clear data structure to store all relevant information about each food place
+
+
+-menus:
+    : each period of the day is described with id 'page-header'
+        : these headings are SIBLINGS, not parents, of the menu lists
+        : the restaurant of the menu is headed by location, with tag 'h3'
+        : the list of items themselves are on tag 'ul'
+            : ul of categories, text of each is name of category
+                : ul of menu items
+    : tag 'a' with class 'recipelink' has dish name text
+    : 'tt-description' is the tooltip text that tells ingredients of the dish
+    : should probably have app download the little icons manually to cache and use
+        : if link already shows up in cache, reuse
+        : if not in cache, download again and store there
+
