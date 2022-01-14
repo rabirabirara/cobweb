@@ -71,7 +71,7 @@ Future<Map<String, Schedule>> fetchHours() async {
       if (hourCells[i].hasChildNodes()) {
         final timeSpan = hourCells[i].getElementsByClassName("hours-range");
 
-        var period = _getPeriodFromText(mealTimes[i])!;
+        var period = _getPeriodFromText(mealTimes[i]);
         Interval? interval;
 
         // If there are no elements with class "hours-range", then it's closed.
@@ -131,7 +131,7 @@ Future<Map<String, Map<DiningPeriod, Menu>>> fetchShortMenus() async {
   // p.key = page-header (period), p,value = menu-block siblings
   // get from a menu block: location, shortMenu
   for (final p in periodMenus.entries) {
-    var period = _getPeriodFromText(p.key)!;
+    var period = _getPeriodFromText(p.key);
 
     // p.values is a list of items (menu-blocks) for a period p.
     // Each menu-block is a different location and menu.

@@ -1,5 +1,3 @@
-import 'package:jiffy/jiffy.dart';
-
 import 'food_place.dart' show FoodPlace;
 import 'schedule.dart' show DiningPeriod, Schedule, ToString;
 
@@ -64,7 +62,7 @@ class Menu {
   @override
   String toString() {
     var out = "";
-    out += "Location: $name\n...at time: ${period!.toPrettyString()}\n";
+    out += "Location: $name\n...at time: ${period.toPrettyString()}\n";
 
     for (final e in _m.entries) {
       out += "Category: " + e.key + '\n';
