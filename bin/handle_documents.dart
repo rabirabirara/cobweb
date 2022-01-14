@@ -58,7 +58,7 @@ Future<Map<String, Hours>> fetchHours() async {
         final asuclaUrl = hourCells[0].querySelector("a")?.attributes['href'];
         print("'$location' is open today; see ${makeUrl(asuclaUrl!)}");
       } else {
-        print("'$location' is closed all day");
+        // print("'$location' is closed all day");
         locationHoursMap.putIfAbsent(location, () => Hours.newClosedAllDay());
       }
       continue;
@@ -94,12 +94,12 @@ Future<Map<String, Hours>> fetchHours() async {
 }
 
 // from uclaMenusUrl
-Future<Map<String, List<Menu>>> fetchShortMenus() async {
+Future<Map<String, Map<DiningPeriod, Menu>>> fetchShortMenus() async {
   var doc = await getDocument(uclaMenusUrl);
   // var doc = await getLocalDocument("menus-periods.html");
 
   // maps location to menus for all periods as available
-  Map<String, List<Menu>> placeMenus = {};
+  Map<String, Map<DiningPeriod, Menu>> placeMenus = {};
 
   // main content div
   // children: nav-extras, announce, headers, detail link, menublock(cols?)
@@ -113,27 +113,31 @@ Future<Map<String, List<Menu>>> fetchShortMenus() async {
   // each period maps period element to a map of menus
   // each map of menus maps location name to shortMenu
   Map<String, List<Element>> periodMenus = {};
-  String? period;
+  String? periodStr;
   List<Element> placeMenuElements = [];
   for (final e in justMenus) {
     if (e.id == "page-header") {
       // period is null if on first iteration
-      if (period != null) {
-        periodMenus.putIfAbsent(period, () => List.from(placeMenuElements));
+      if (periodStr != null) {
+        periodMenus.putIfAbsent(periodStr, () => List.from(placeMenuElements));
         placeMenuElements.clear();
       }
-      period = e.text;
+      periodStr = e.text;
     } else if (e.className.contains("menu-block")) {
       placeMenuElements.add(e);
     }
   }
-  if (period != null) {
-    periodMenus.putIfAbsent(period, () => placeMenuElements);
+  if (periodStr != null) {
+    periodMenus.putIfAbsent(periodStr, () => placeMenuElements);
   }
 
+  // now that you have period and a bunch of menu blocks:
+  // get from a menu block: location, shortMenu
   for (final p in periodMenus.entries) {
     var period = _getPeriodFromText(p.key);
     var location = _getLocationFromMenuElement(p.value.first)!;
+
+    // First, produce a list of short menus from the menu-item elements.
     var menus = p.value.map((e) {
       var m = _getMenuFromMenuElement(e);
       // * Set the shortMenu's period.
@@ -141,7 +145,13 @@ Future<Map<String, List<Menu>>> fetchShortMenus() async {
       return m;
     }).toList();
 
-    placeMenus.putIfAbsent(location, () => menus);
+    // Second, map: period -> menu.
+    placeMenus.putIfAbsent(
+        location,
+        () => {
+              for (var m in menus) m.period!: m,
+            });
+    // We end with map: Location -> Periods -> Menus.
   }
 
   return placeMenus;

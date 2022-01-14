@@ -34,17 +34,11 @@ Future<void> main(List<String> arguments) async {
 
     // all menus for the location e.key
     var ms = e.value;
-    for (final m in ms) {
-      var p = m.period!;
-      r.putShortMenu(p, m);
+    for (final m in ms.entries) {
+      r.putShortMenu(m.key, m.value);
     }
 
     halls.add(r);
-
-    // print(e.key);
-    // for (final loc in e.value) {
-    //   print(loc.toString());
-    // }
   }
 
   halls.forEach(print);

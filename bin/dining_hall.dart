@@ -19,6 +19,7 @@ class DiningHall extends FoodPlace {
   @override
   String toString() {
     String out = "";
+    out += "== $name ==\n";
     out += hours.toString();
     for (final e in shortMenus.entries) {
       out += e.key.toPrettyString() + " ::\n";
@@ -58,7 +59,7 @@ class Menu {
   @override
   String toString() {
     var out = "";
-    out += "Location: " + (location ?? "N/A") + '\n';
+    // out += "Location: " + (location ?? "N/A") + '\n';
 
     for (final e in _m.entries) {
       out += "Category: " + e.key + '\n';

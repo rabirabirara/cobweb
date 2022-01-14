@@ -66,12 +66,13 @@ class Hours {
       return "CLOSED";
     } else {}
     return _timeIntervals.map((e) {
-      if (e != null) {
-        return e.toString();
-      } else {
-        return "CLOSED";
-      }
-    }).join(' ');
+          if (e != null) {
+            return e.toString();
+          } else {
+            return "CLOSED";
+          }
+        }).join('\n') +
+        "\n";
   }
 }
 
